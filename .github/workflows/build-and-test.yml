@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest    
     outputs:
         version: ${{ steps.version.outputs.version }} 
+        report: ${{ steps.version.outputs.report }} 
     steps:
       # Remember we have to check out the repository first!
       - name: Checkout repository
@@ -39,12 +40,21 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Generate test report
+        id: report
+        run: |
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          echo "Test Results:" >> $GITHUB_OUTPUT
+          echo "=============" >> $GITHUB_OUTPUT
+          npm test >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT        
+
     
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy version
-        run: echo "Deploying version ${{ needs.build.outputs.version }}"
-    
+        run: echo "Deploying version ${{ needs.build.outputs.version }}"    
 
